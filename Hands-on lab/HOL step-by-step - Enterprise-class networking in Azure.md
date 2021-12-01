@@ -607,6 +607,8 @@ In this exercise, you will create and configure a load balancer to distribute lo
 
     -  IP address assignment: Select **Static** and enter the IP address **10.8.0.100**.
 
+    -  Availability zone: **1**
+
     Ensure your **Create load balancer - Frontend IP configuration** dialog looks like the following, and select **Add**, **Review + create** then select **Create**.
 
     ![In this screenshot, the 'Frontend IP configuration' blade is depicted with the required settings listed above selected along with the 'Review + create' button.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/frontendip.png "Frontend IP configuration")
@@ -615,29 +617,46 @@ In this exercise, you will create and configure a load balancer to distribute lo
 
 ### Task 2: Configure the load balancer
 
-1.  Open the **WGWEBLB** load balancer in the Azure portal.
+1. Using the portal, disassociate the public IP from the NIC of **WGWEB1** VM. Do this by navigating to the VM and selecting **Networking** under **Settings** on the left. Select the **NIC Public IP** then choose **Dissociate**. Select **Yes** when prompted.
 
-2.  Select **Backend pools**, and select **+Add** at the beginning.
+    ![In this screenshot, the WGWEB1 - Networking blade of the Azure portal is depicted with the NIC Public IP selected.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image79.png "Virtual machine networking blade")
+
+2. Next, return to the **WGWEB1 - Networking** blade and select the **Network Interface**.
+
+3. Select **IP configurations** under **Settings** on the left.
+
+    ![In this screenshot, the network interface page for the web server on the Azure portal is depicted with 'IP configuration' selected on the left.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image169.png "Network interface blade")
+
+4. Next, select **ipconfig1** shown above.
+
+5. Select and make sure that the **Public IP address settings** is shown as **Dissociate**, and select **Save** if necessary. This should remove the public IP address from the network interface of the VM.
+
+    ![In this screenshot, the 'ipconfig1' blade of the web server NIC is depicted with the 'Public IP address' set to 'Disassociate' and the Save button selected.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image170.png "IP configuration blade")
+
+6.  Open the **WGWEBLB** load balancer in the Azure portal.
+
+7.  Select **Backend pools**, and select **+Add** at the beginning.
 
     ![In this screenshot, the Azure portal blade for the WGWEBLB load balancer is depicted with Backend pools' selected on the left and the '+ Add' button selected.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image67.png "Load balancer blade")
 
-3.  Enter **LBBE** for the pool name. Under **Associated to**, select **Virtual machine**.
+8.  Enter **LBBE** for the pool name. Under **Associated to**, select **Virtual machine**.
+    Virtual Network will be **WGVNet2 (WGVNetRG2)** -  not webrg-vnet as shown in screen shot.
 
     ![In this screenshot, the 'Add backend pool' blade is depicted with the Name and 'Associated to' fields filled in as listed above.](images/2020-01-27-18-33-43.png "Add backend pool blade")
 
-4.  Under **Virtual machine**, select **+ Add** and choose the **WGWEB1** and **WGWEB2** virtual machines and select **Add**.
+9.  Under **Virtual machine**, select **+ Add** and choose the **WGWEB1** and **WGWEB2** virtual machines and select **Add**.
 
-5.  Select **Add** at the bottom of the **Add backend pool** blade to add the backend pool.
+10.  Select **Add** at the bottom of the **Add backend pool** blade to add the backend pool.
 
-6.  Wait to proceed until the Backend pool configuration is finished updating.
+11.  Wait to proceed until the Backend pool configuration is finished updating.
 
     ![In this screenshot, the 'WGWEBLB - Backend pools' blade of the Azure portal is depicted. The two virtual machines in the backend pool show a status of running, indicating that the backend pool configuration is complete.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image167.png "Backend pool blade")
 
-    >**Note**: If you do not see WGWEB1 in the Virtual Machine selection list, the public IP address was not created as a Standard SKU.  Locate **webip** and in the **Overview** tile, select the **Upgrade to Standard SKU** banner to change the SKU.  You will need to change the IP to static in the **Configuration** and temporarily disassociate it from **WGWEB1NetworkInterface**.
+    >**Note**: If you do not see WGWEB1 in the Virtual Machine selection list, the public IP address was not created as a Standard SKU.  Go the VM WGWEB1, click on the Public IP AddressLocate **webip** and in the **Overview** tile, select the **Upgrade to Standard SKU** banner to change the SKU.  You will need to change the IP to static in the **Configuration** and temporarily disassociate it from **WGWEB1NetworkInterface**.
 
     ![In this screenshot, the upgrade to standard sku will take you through the process of upgrading the public IP address.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/upgradesku.png "Upgrade Public IP from Basic to Standard")
 
-7.  Next, under **Settings** on the WGWEBLB Load Balancer blade select **Health Probes**. Select **+ Add**, and use the following information to create a health probe.
+12.  Next, under **Settings** on the WGWEBLB Load Balancer blade select **Health Probes**. Select **+ Add**, and use the following information to create a health probe.
 
     -  Name: **HTTP**
 
@@ -647,9 +666,9 @@ In this exercise, you will create and configure a load balancer to distribute lo
 
     ![In this screenshot, the 'Add health probe' blade is depicted with the required settings listed above selected along with the Add button selected.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image75.png "Add health probe blade")
 
-8.  Select **Add**.
+13.  Select **Add**.
 
-9.  After the Health probe has updated. Select **Load balancing rules**. Select **+Add** and complete the configuration as shown below followed by selecting **OK**.
+14.  After the Health probe has updated. Select **Load balancing rules**. Select **+Add** and complete the configuration as shown below followed by selecting **OK**.
 
     - Name: **HTTP**
   
@@ -659,27 +678,12 @@ In this exercise, you will create and configure a load balancer to distribute lo
 
     **It will take 2-3 minutes for the changes to save.**
 
-10. Connect to WGWEB1 via Bastion, open your browser and navigate to <http://10.8.0.100>. Ensure that you successfully connect to either one of two Web servers. 
+15. Connect to WGWEB1 via Bastion, open your browser and navigate to <http://10.8.0.100>. Ensure that you successfully connect to either one of two Web servers. 
 
     ![In this screenshot, the web page that appears when you navigate to the load balancer IP address appears indicating that your successfully connected to the WEB1 web server.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image77.png "Server response")
 
     ![In this screenshot, the web page that appears when you navigate to the load balancer IP address appears indicating that your successfully connected to the WEB2 web server.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image78.png "Server response")
 
-11. Using the portal, disassociate the public IP from the NIC of **WGWEB1** VM. Do this by navigating to the VM and selecting **Networking** under **Settings** on the left. Select the **NIC Public IP** then choose **Dissociate**. Select **Yes** when prompted.
-
-    ![In this screenshot, the WGWEB1 - Networking blade of the Azure portal is depicted with the NIC Public IP selected.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image79.png "Virtual machine networking blade")
-
-12. Next, return to the **WGWEB1 - Networking** blade and select the **Network Interface**.
-
-13. Select **IP configurations** under **Settings** on the left.
-
-    ![In this screenshot, the network interface page for the web server on the Azure portal is depicted with 'IP configuration' selected on the left.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image169.png "Network interface blade")
-
-14. Next, select **ipconfig1** shown above.
-
-15. Select and make sure that the **Public IP address settings** is shown as **Dissociate**, and select **Save** if necessary. This should remove the public IP address from the network interface of the VM.
-
-    ![In this screenshot, the 'ipconfig1' blade of the web server NIC is depicted with the 'Public IP address' set to 'Disassociate' and the Save button selected.](images/Hands-onlabstep-by-step-Enterprise-classnetworkinginAzureimages/media/image170.png "IP configuration blade")
 
 ## Exercise 6: Provision and configure Azure firewall solution
 
@@ -874,7 +878,7 @@ In this exercise, we will simulate an on-premises connection to the internal web
 
 3.  Specify the following configuration for the subnet, and select **Save**:
 
-    -  Subnet address range: **192.168.1.0/29**
+    -  Subnet address range: **192.168.1.0/27**
 
     -  Route table: **None** (We will add this later.)
 
